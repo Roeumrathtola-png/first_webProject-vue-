@@ -1,0 +1,66 @@
+<template>
+  <div>
+    <HeroSection />
+    <FilterBar />
+    <ProduceGrid @add-to-cart="addToCard" />
+    <CartContainer :items="items" @remove="removeItem" @clear="clearItems" />
+    <PerkBox />
+    <NewLatter />
+  </div>
+</template>
+<script>
+import HeroSection from '@/components/HeroSection.vue'
+import FilterBar from '@/components/FilterBar.vue'
+import ProduceGrid from '@/components/ProduceGrid.vue'
+import CartContainer from '@/components/CartContainer.vue'
+import PerkBox from '@/components/PerkBox.vue'
+import NewLatter from '@/components/NewLatter.vue'
+
+export default {
+  components: {
+    HeroSection,
+    FilterBar,
+    ProduceGrid,
+    CartContainer,
+    PerkBox,
+    NewLatter,
+  },
+
+  data() {
+    return {
+      message: 'Hello, Vite!',
+      items: [
+        { name: 'Semicolon Sticker Pack', unitPrice: 4.0, quantity: 2 },
+        { name: 'Git Push Mug', unitPrice: 12.0, quantity: 1 },
+        { name: 'Dark Mode Tee', unitPrice: 22.0, quantity: 1 },
+      ],
+    }
+  },
+  computed: {
+    totalItems() {
+      return this.items.reduce((sum, item) => sum + item.quantity, 0)
+    },
+  },
+
+  methods: {
+    increaseItemsCount() {
+      this.itemsCount++
+    },
+    addToCard(product) {
+      const existingItem = this.items.find((item) => item.name === product.name)
+      if (existingItem) {
+        existingItem.quantity++
+      } else {
+        this.items.push({ name: product.name, unitPrice: product.price, quantity: 1 })
+      }
+    },
+    removeItem(item) {
+      const index = this.items.indexOf(item)
+      this.items.splice(index, 1)
+    },
+    clearItems() {
+      this.items = []
+    },
+  },
+}
+</script>

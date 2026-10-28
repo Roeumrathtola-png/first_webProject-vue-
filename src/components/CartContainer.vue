@@ -3,17 +3,17 @@
   <section id="cart" class="max-w-3xl mx-auto px-6 py-14">
     <div class="flex items-center gap-3 mb-6">
       <div class="w-4 h-4 bg-brand border-2 border-black"></div>
-      <h2 class="text-2xl font-black uppercase">Your cart({{ itemcount }}item)</h2>
+      <h2 class="text-2xl font-black uppercase">Your cart ({{ itemcount }} item)</h2>
     </div>
 
     <div class="bg-white border-4 border-black shadow-brutal p-5">
-      <ul class="space-y-3">
-        <SemiCard v-for="item in items" :key="item.name" :item="item" />
-        <SemiCard @remove="removeItem" v-for="item in items" :key="item.name" :item="item" />
+      <!-- 1. Single unified v-for loop with the remove event attached -->
+      <ul class="space-y-3" v-if="items.length > 0">
+        <SemiCard v-for="item in items" :key="item.name" :item="item" @remove="removeItem" />
       </ul>
 
-      <!-- 6b. EMPTY CART (hidden now — show it when the cart has no rows) -->
-      <p class="hidden border-2 border-black bg-paper p-4 text-center font-extrabold uppercase">
+      <!-- 2. Dynamic empty cart message using v-if / v-else -->
+      <p v-else class="border-2 border-black bg-paper p-4 text-center font-extrabold uppercase">
         Your cart is empty.
       </p>
 
@@ -38,29 +38,23 @@
     </div>
   </section>
 </template>
+
 <script>
 import SemiCard from '@/components/Semicard/SemiCard.vue'
+import { useCartStore } from '@/stores/Cart'
+import { mapState, mapActions } from 'pinia'
+
 export default {
   components: {
     SemiCard,
   },
   props: ['items'],
-  emits: ['removeitem', 'clearitem'],
+  emits: ['remove', 'clear'],
   methods: {
-    removeItem(item) {
-      this.$emit('removeitem', item)
-    },
-    clearItems() {
-      this.$emit('clearitem')
-    },
+    ...mapActions(useCartStore, ['remove', 'clear']),
   },
   computed: {
-    total() {
-      return this.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0).toFixed(2)
-    },
-    itemcount() {
-      return this.items.reduce((sum, item) => sum + item.quantity, 0)
-    },
+    ...mapState(useCartStore, ['total', 'itemcount']),
   },
 }
 </script>

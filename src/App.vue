@@ -1,36 +1,21 @@
 <template>
   <div>
     <AnnounBar />
-    <NavBar :itemsCount="totalItems" />
-    <HeroSection />
-    <FilterBar />
-    <ProduceGrid @add-to-cart="addToCard" />
-    <CartContainer :items="items" @removeitem="removeItem" @clearitem="clearItems" />
-    <PerkBox />
-    <NewLatter />
+    <NavBar />
+    <main id="top">
+      <RouterView />
+    </main>
     <FooterSection />
   </div>
 </template>
 <script>
 import AnnounBar from '@/components/AnnounBar.vue'
 import NavBar from '@/components/NavBar.vue'
-import HeroSection from './components/HeroSection.vue'
-import FilterBar from './components/FilterBar.vue'
-import ProduceGrid from './components/ProduceGrid.vue'
-import CartContainer from './components/CartContainer.vue'
-import PerkBox from './components/PerkBox.vue'
-import NewLatter from './components/NewLatter.vue'
 import FooterSection from './components/FooterSection.vue'
 
 export default {
   components: {
     NavBar,
-    HeroSection,
-    FilterBar,
-    ProduceGrid,
-    CartContainer,
-    PerkBox,
-    NewLatter,
     FooterSection,
     AnnounBar,
   },
