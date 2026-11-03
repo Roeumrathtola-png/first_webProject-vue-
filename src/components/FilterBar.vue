@@ -37,17 +37,12 @@
         </button>
       </div>
     </div>
-
-    <p class="mt-4 text-sm font-bold uppercase">Showing {{ itemcount }} of {{ total }} products</p>
-    <CourseSection @update-count="updateCount" />
   </section>
 </template>
 <script>
-import CourseSection from '@/components/CourseSection.vue'
 export default {
-  components: {
-    CourseSection,
-  },
+  components: {},
+
   data() {
     return {
       itemcount: 0,

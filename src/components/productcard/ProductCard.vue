@@ -57,7 +57,10 @@ import { mapActions } from 'pinia'
 import { useCartStore } from '@/stores/Cart'
 export default {
   props: {
-    product: [],
+    product: {
+      type: Object,
+      required: true
+    }
   },
 
   methods: {

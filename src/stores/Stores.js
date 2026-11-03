@@ -6,20 +6,49 @@ export const useProductStore = defineStore('products', {
     meta: {},
     error: '',
     loading: false,
+
   }),
-  getters: {},
+  getters: {
+    hasPreviousPage: (state) => state.meta.page > 1,
+    hasNextPage: (state) => state.meta.page < state.meta.totalPages,
+  },
   actions: {
     async fetchProduct() {
       try {
+        // Use dynamic page and limit from state so pagination works!
+        const page = this.meta.page || 1
+        const limit = this.meta.limit || 10
         let response = await fetch(
-          'https://brutal-api-sample.onrender.com/api/products?limit=10&page=1',
+          `https://brutal-api-sample.onrender.com/api/products?limit=${limit}&page=${page}`
         )
         response = await response.json()
+        if (response.error) throw new Error(response.error)
         this.products = response.data
         this.meta = response.meta
       } catch (err) {
         this.error = err.message
       }
+    },
+    async goToPage(page) {
+      const target = Math.floor(Number(page))
+      // the API rejects page < 1 and returns empty data past totalPages
+      if (!Number.isFinite(target) || target < 1) return
+      if (this.meta.totalPages && target > this.meta.totalPages) return
+      if (target === this.meta.page) return
+      this.meta.page = target
+      await this.fetchProduct()
+    },
+    async nextPage() {
+      await this.goToPage(this.meta.page + 1)
+    },
+    async previousPage() {
+      await this.goToPage(this.meta.page - 1)
+    },
+    async fetchUpdateOption(option) {
+      this.meta.limit = option
+      // total pages change with the page size, so start over from page 1
+      this.meta.page = 1
+      await this.fetchProduct()
     },
   },
 })

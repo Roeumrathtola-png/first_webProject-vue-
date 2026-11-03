@@ -29,9 +29,7 @@ export default {
     NewLatter,
   },
   data() {
-    return {
-      // No local data needed for cart items, as we will use Pinia store
-    }
+    return 
   },
   methods: {
     ...mapActions(useCartStore, {
