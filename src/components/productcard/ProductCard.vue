@@ -20,6 +20,7 @@
       <p class="text-sm font-medium">{{ product.description }}</p>
       <div class="mt-auto pt-3 flex items-center justify-between gap-2">
         <p class="text-xl font-black">
+          $
           {{ product.price }}
           <span v-if="product.oldPrice" class="text-sm font-bold line-through text-black/50">{{
             product.oldPrice
@@ -55,8 +56,10 @@
 import { mapActions } from 'pinia'
 import { useCartStore } from '@/stores/Cart'
 export default {
-  props: ['product'],
-  emits: ['add'],
+  props: {
+    product: [],
+  },
+
   methods: {
     ...mapActions(useCartStore, { addToCart: 'add' }),
   },

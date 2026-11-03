@@ -44,30 +44,22 @@
 </template>
 <script>
 import CourseSection from '@/components/CourseSection.vue'
-    export default {
-      components: {
-        CourseSection,
-
-      },
-      data() {
-        return {
-
-          itemcount:0,
-          total:0,
-        }
-      },
-
-      methods: {
-        updateCount(count) {
-          this.itemcount = count;
-          this.total = count; // Update the total as well if needed
-        },
-      },
-
-
-
-
-
+export default {
+  components: {
+    CourseSection,
+  },
+  data() {
+    return {
+      itemcount: 0,
+      total: 0,
     }
+  },
 
+  methods: {
+    updateCount(count) {
+      this.itemcount = count
+      this.total = count // Update the total as well if needed
+    },
+  },
+}
 </script>

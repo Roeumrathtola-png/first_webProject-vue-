@@ -2,6 +2,7 @@
   <div>
     <HeroSection />
     <FilterBar />
+    <!-- <CourseSection /> -->
     <ProduceGrid @add-to-cart="addToCard" />
     <CartContainer :items="items" @remove="removeItem" @clear="clearItems" />
     <PerkBox />
@@ -15,6 +16,8 @@ import ProduceGrid from '@/components/ProduceGrid.vue'
 import CartContainer from '@/components/CartContainer.vue'
 import PerkBox from '@/components/PerkBox.vue'
 import NewLatter from '@/components/NewLatter.vue'
+import { useCartStore } from '@/stores/Cart'
+import { mapState, mapActions } from 'pinia'
 
 export default {
   components: {
@@ -25,42 +28,20 @@ export default {
     PerkBox,
     NewLatter,
   },
-
   data() {
     return {
-      message: 'Hello, Vite!',
-      items: [
-        { name: 'Semicolon Sticker Pack', unitPrice: 4.0, quantity: 2 },
-        { name: 'Git Push Mug', unitPrice: 12.0, quantity: 1 },
-        { name: 'Dark Mode Tee', unitPrice: 22.0, quantity: 1 },
-      ],
+      // No local data needed for cart items, as we will use Pinia store
     }
   },
-  computed: {
-    totalItems() {
-      return this.items.reduce((sum, item) => sum + item.quantity, 0)
-    },
-  },
-
   methods: {
-    increaseItemsCount() {
-      this.itemsCount++
-    },
-    addToCard(product) {
-      const existingItem = this.items.find((item) => item.name === product.name)
-      if (existingItem) {
-        existingItem.quantity++
-      } else {
-        this.items.push({ name: product.name, unitPrice: product.price, quantity: 1 })
-      }
-    },
-    removeItem(item) {
-      const index = this.items.indexOf(item)
-      this.items.splice(index, 1)
-    },
-    clearItems() {
-      this.items = []
-    },
+    ...mapActions(useCartStore, {
+      addToCard: 'add',
+      removeItem: 'remove',
+      clearItems: 'clear',
+    }),
+  },
+  computed: {
+    ...mapState(useCartStore, ['items']),
   },
 }
 </script>

@@ -4,12 +4,14 @@
     <li class="flex items-center justify-between gap-3 border-2 border-black bg-paper p-3">
       <div>
         <p class="text-sm font-extrabold uppercase">{{ item.name }}</p>
-        <p class="text-xs font-medium">${{ item.Price }} × {{ item.quantity }}</p>
+        <p class="text-xs font-medium">
+          ${{ Number(item.price).toFixed(2) }} × {{ item.quantity }}
+        </p>
       </div>
       <div class="flex items-center gap-3">
-        <p class="font-black">${{ (item.Price * item.quantity).toFixed(2) }}</p>
+        <p class="font-black">${{ Number(item.price * item.quantity).toFixed(2) }}</p>
         <button
-          @click="$emit('remove', item)"
+          @click="removeItem(item.id)"
           class="border-2 border-black bg-white px-2 py-1 text-xs font-extrabold uppercase cursor-pointer hover:bg-brand hover:text-white"
         >
           Remove
@@ -23,10 +25,12 @@ import { mapActions } from 'pinia'
 import { useCartStore } from '@/stores/Cart'
 
 export default {
-  props: ['item'],
+  props: {
+    item: [],
+  },
 
   methods: {
-    ...mapActions(useCartStore, ['remove']),
+    ...mapActions(useCartStore, { removeItem: 'remove' }),
   },
 }
 </script>
