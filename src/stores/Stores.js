@@ -3,10 +3,16 @@ import { defineStore } from 'pinia'
 export const useProductStore = defineStore('products', {
   state: () => ({
     products: [],
-    meta: {},
+    meta: {
+      page: 1,
+      limit: 8,
+      total: 0,
+      totalPages: 1,
+      category: 'All', // 🔥 Ensure category is defined in initial state
+      search: '', // 🔥 Ensure search is defined in initial state
+    },
     error: '',
     loading: false,
-
   }),
   getters: {
     hasPreviousPage: (state) => state.meta.page > 1,
@@ -15,23 +21,49 @@ export const useProductStore = defineStore('products', {
   actions: {
     async fetchProduct() {
       try {
-        // Use dynamic page and limit from state so pagination works!
-        const page = this.meta.page || 1
-        const limit = this.meta.limit || 10
+        this.loading = true
+        this.error = ''
+
+        // 🔥 Fix: Read category from meta.category instead of products[0]
+        const categoryParam =
+          this.meta.category && this.meta.category !== 'All'
+            ? `&category=${encodeURIComponent(this.meta.category)}`
+            : ''
+        const searchParam = this.meta.search
+          ? `&search=${encodeURIComponent(this.meta.search)}`
+          : ''
+
         let response = await fetch(
-          `https://brutal-api-sample.onrender.com/api/products?limit=${limit}&page=${page}`
+          `https://brutal-api-sample.onrender.com/api/products?limit=${this.meta.limit}&page=${this.meta.page}${categoryParam}${searchParam}`,
         )
         response = await response.json()
         if (response.error) throw new Error(response.error)
+
         this.products = response.data
-        this.meta = response.meta
+
+        // Preserve category & limit when assigning meta from response
+        this.meta = {
+          ...this.meta,
+          ...response.meta,
+        }
       } catch (err) {
         this.error = err.message
+      } finally {
+        this.loading = false
       }
+    },
+    async setCategory(category) {
+      this.meta.category = category
+      this.meta.page = 1 // Reset to page 1 whenever category changes
+      await this.fetchProduct()
+    },
+    async setSearch(query) {
+      this.meta.search = query
+      this.meta.page = 1 // Reset to page 1 on new search
+      await this.fetchProduct()
     },
     async goToPage(page) {
       const target = Math.floor(Number(page))
-      // the API rejects page < 1 and returns empty data past totalPages
       if (!Number.isFinite(target) || target < 1) return
       if (this.meta.totalPages && target > this.meta.totalPages) return
       if (target === this.meta.page) return
@@ -46,7 +78,6 @@ export const useProductStore = defineStore('products', {
     },
     async fetchUpdateOption(option) {
       this.meta.limit = option
-      // total pages change with the page size, so start over from page 1
       this.meta.page = 1
       await this.fetchProduct()
     },

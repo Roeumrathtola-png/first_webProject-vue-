@@ -1,21 +1,14 @@
 <template>
   <section class="max-w-6xl mx-auto px-6 pt-14">
-    <select
-      v-model="currentOption"
-      class="border-2 border-black bg-white px-3 py-2 mb-6 text-sm font-extrabold uppercase cursor-pointer"
-    >
-      <option v-for="(item, index) in pageOptions" :key="index" :value="item">{{ item }}</option>
-    </select>
-    <label for="limit-select" class="font-extrabold uppercase text-sm">Items per page:</label>
+    <label for="limit-select" class="font-extrabold uppercase text-sm mr-2">Items per page:</label>
     <select
       id="limit-select"
-      @change="changeLimit($event.target.value)"
-      class="border-2 border-black bg-white px-3 py-1 font-bold cursor-pointer"
+      v-model.number="currentOption"
+      class="border-2 border-black bg-white px-3 py-2 mb-6 text-sm font-extrabold uppercase cursor-pointer"
     >
-      <option value="5">5</option>
-      <option value="10" selected>10</option>
-      <option value="20">20</option>
-      <option value="50">50</option>
+      <option v-for="currentoption in pageOptions" :key="currentoption" :value="currentoption">
+        {{ currentoption }}
+      </option>
     </select>
 
     <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -84,8 +77,9 @@ export default {
   },
   data() {
     return {
-      currentOption: 'All',
-      pageOptions: ['All', 'Stickers', 'Apparel', 'Desk'],
+      currentOption: 4,
+      pageOptions: [4, 8, 16, 48],
+      limitoption: 0,
       enabledClass: 'bg-white hover:bg-paper cursor-pointer',
       disabledClass: 'bg-paper text-black/40 cursor-not-allowed',
     }
@@ -113,8 +107,8 @@ export default {
     },
   },
   watch: {
-    currentOption(newOption) {
-      this.fetchProduct(newOption)
+    currentOption(pageOption) {
+      this.fetchProduct(pageOption)
     },
   },
   emits: ['add'],
@@ -127,10 +121,6 @@ export default {
       'previousPage',
       'fetchUpdateOption',
     ]),
-  },
-  changeLimit(eventValue) {
-    // Passes the selected number (e.g., 5, 10, 20) to your store action
-    this.fetchUpdateOption(Number(eventValue))
   },
 }
 </script>

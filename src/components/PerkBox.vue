@@ -50,6 +50,11 @@ export default {
           title: '30 days return',
           description: 'Order more than $30 and we pay for the delivery.',
         },
+        {
+          number: 'Ossca 03',
+          title: 'Free sticker',
+          description: 'Order more than $30 and we pay for the delivery.',
+        },
       ],
     }
   },

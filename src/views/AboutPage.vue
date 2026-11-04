@@ -1,13 +1,16 @@
 <template>
-<ProduceGrid />
+  <PerkBox />
+  <FaqSection />
 </template>
 
 <script>
-import ProduceGrid from '@/components/ProduceGrid.vue'
+import PerkBox from '@/components/PerkBox.vue'
+import FaqSection from '@/components/FaqSection.vue'
 
 export default {
   components: {
-    ProduceGrid,
+    PerkBox,
+    FaqSection,
   },
 }
 </script>
