@@ -26,6 +26,11 @@
             About
           </RouterLink>
         </li>
+        <li v-if="isAdmin">
+          <RouterLink to="/admin" class="px-3 py-2 border-2 border-transparent hover:border-black">
+            Admin
+          </RouterLink>
+        </li>
         <li>
           <RouterLink
             to="/cart"
@@ -41,7 +46,13 @@
 </template>
 
 <script>
+import { mapState } from 'pinia'
+import { useAuthStore } from '@/stores/auth.js'
+
 export default {
+  computed: {
+    ...mapState(useAuthStore, ['isAdmin']),
+  },
   props: {
     itemsCount: {
       type: Number,

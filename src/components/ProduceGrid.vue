@@ -85,7 +85,8 @@ export default {
     }
   },
   async created() {
-    await this.fetchProduct()
+    // Sync the store's limit with the selected option before the first fetch
+    await this.fetchUpdateOption(this.currentOption)
   },
   computed: {
     ...mapState(useProductStore, ['products', 'meta', 'hasPreviousPage', 'hasNextPage']),
@@ -108,14 +109,13 @@ export default {
   },
   watch: {
     currentOption(pageOption) {
-      this.fetchProduct(pageOption)
+      this.fetchUpdateOption(pageOption)
     },
   },
   emits: ['add'],
 
   methods: {
     ...mapActions(useProductStore, [
-      'fetchProduct',
       'goToPage',
       'nextPage',
       'previousPage',
