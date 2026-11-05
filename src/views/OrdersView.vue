@@ -40,21 +40,23 @@
   </section>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue'
 import { getMyOrders } from '@/services/api.js'
 
-export default {
-  data() {
-    return { orders: [], loading: true, error: '' }
-  },
-  async created() {
-    try {
-      this.orders = await getMyOrders()
-    } catch (err) {
-      this.error = err.message
-    } finally {
-      this.loading = false
-    }
-  },
+const orders = ref([])
+const loading = ref(true)
+const error = ref('')
+
+async function loadOrders() {
+  try {
+    orders.value = await getMyOrders()
+  } catch (err) {
+    error.value = err.message
+  } finally {
+    loading.value = false
+  }
 }
+
+loadOrders()
 </script>

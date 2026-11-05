@@ -3,28 +3,39 @@
   <section id="cart" class="max-w-3xl mx-auto px-6 py-14">
     <div class="flex items-center gap-3 mb-6">
       <div class="w-4 h-4 bg-brand border-2 border-black"></div>
-      <h2 class="text-2xl font-black uppercase">Your cart ({{ items.length }} item)</h2>
+      <h2 class="text-2xl font-black uppercase">
+        Your cart ({{ count }} {{ count === 1 ? 'item' : 'items' }})
+      </h2>
     </div>
 
     <div class="bg-white border-4 border-black shadow-brutal p-5">
       <!-- 1. Single unified v-for loop with the remove event attached -->
       <ul class="space-y-3" v-if="items.length > 0">
-        <SemiCard v-for="item in items" :key="item.name" :item="item" @remove="removeitem" />
+        <SemiCard v-for="item in items" :key="item.id" :item="item" @remove="removeitem" />
       </ul>
 
       <!-- 2. Dynamic empty cart message using v-if / v-else -->
-      <p v-else class="border-2 border-black bg-paper p-4 text-center font-extrabold uppercase">
+      <p
+        v-else
+        class="border-2 border-black bg-paper p-4 text-center text-sm font-extrabold uppercase shadow-brutal-sm"
+      >
         Your cart is empty.
       </p>
 
       <div
         class="mt-5 pt-5 border-t-4 border-black flex flex-wrap items-center justify-between gap-4"
       >
-        <p class="text-2xl font-black uppercase">Total: ${{ total }}</p>
+        <p class="text-2xl font-black uppercase">Total: ${{ total.toFixed(2) }}</p>
         <div class="flex gap-3">
           <button
             @click="clearitem"
-            class="border-2 border-black bg-white px-4 py-2 text-sm font-extrabold uppercase cursor-pointer"
+            :disabled="items.length === 0"
+            :class="
+              items.length === 0
+                ? 'bg-paper text-black/40 cursor-not-allowed'
+                : 'bg-white hover:bg-paper cursor-pointer'
+            "
+            class="border-2 border-black px-4 py-2 text-sm font-extrabold uppercase"
           >
             Clear
           </button>
@@ -40,27 +51,13 @@
   </section>
 </template>
 
-<script>
+<script setup>
 import SemiCard from '@/components/Semicard/SemiCard.vue'
 import { useCartStore } from '@/stores/Cart'
-import { mapState, mapActions } from 'pinia'
+import { storeToRefs } from 'pinia'
 
-export default {
-  components: {
-    SemiCard,
-  },
-  props: {
-    items: [],
-  },
-  emits: ['remove', 'clear'],
-  methods: {
-    ...mapActions(useCartStore, {
-      removeitem: 'remove',
-      clearitem: 'clear',
-    }),
-  },
-  computed: {
-    ...mapState(useCartStore, { total: 'total', count: 'count' }),
-  },
-}
+// Reads the cart straight from the store, so it works on any page without props
+const cart = useCartStore()
+const { items, total, count } = storeToRefs(cart)
+const { remove: removeitem, clear: clearitem } = cart
 </script>

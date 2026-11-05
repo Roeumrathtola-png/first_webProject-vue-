@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { login as loginRequest, setToken } from '@/services/api.js'
+import { getMe, login as loginRequest, setToken } from '@/services/api.js'
 import { loadJSON, saveJSON } from '@/utils/storage.js'
 
 const KEY = 'brutal-auth'
@@ -21,6 +21,18 @@ export const useAuthStore = defineStore('auth', {
         this.user = saved.user
         this.token = saved.token
         setToken(saved.token)
+        // Ask the server who this token belongs to, so the saved user stays up to date
+        this.fetchMe()
+      }
+    },
+    // Refresh the user from GET /auth/me. A 401 is handled by onUnauthorized in main.js (logs out)
+    async fetchMe() {
+      try {
+        const result = await getMe()
+        this.user = result.user ?? result
+        saveJSON(KEY, { user: this.user, token: this.token })
+      } catch {
+        // offline or server error: keep the saved user until the next request
       }
     },
     // Throws if the server says 401, so the page can show the message (Invalid email or password)

@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { getProduct } from '@/services/api.js'
 
 export const useCartStore = defineStore('cart', {
   state: () => ({
@@ -23,6 +24,21 @@ export const useCartStore = defineStore('cart', {
     },
     clear() {
       this.items = []
+    },
+    // Refresh name and price of each cart line from GET /products/:id.
+    // A product that fails to load keeps its saved details.
+    async syncProducts() {
+      await Promise.all(
+        this.items.map(async (item) => {
+          try {
+            const product = await getProduct(item.id)
+            item.name = product.name
+            item.price = product.price
+          } catch {
+            // product missing or server unreachable: keep the saved line
+          }
+        }),
+      )
     },
   },
 })

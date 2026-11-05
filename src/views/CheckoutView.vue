@@ -50,40 +50,33 @@
   </section>
 </template>
 
-<script>
-import { mapActions, mapState } from 'pinia'
+<script setup>
+import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/auth.js'
 import { useCartStore } from '@/stores/Cart.js'
 import { createOrder } from '@/services/api.js'
 
-export default {
-  data() {
-    return {
-      placing: false,
-      orderError: '',
-      lastOrder: null,
-    }
-  },
-  computed: {
-    ...mapState(useAuthStore, ['user']),
-    ...mapState(useCartStore, ['items', 'total']),
-  },
-  methods: {
-    ...mapActions(useCartStore, ['clear']),
-    async placeOrder() {
-      this.orderError = ''
-      this.placing = true
-      try {
-        // The server works out prices and totals, so we only send what the user picked
-        const items = this.items.map((item) => ({ productId: item.id, quantity: item.quantity }))
-        this.lastOrder = await createOrder(items)
-        this.clear()
-      } catch (err) {
-        this.orderError = err.message
-      } finally {
-        this.placing = false
-      }
-    },
-  },
+const { user } = storeToRefs(useAuthStore())
+const cart = useCartStore()
+const { items, total } = storeToRefs(cart)
+
+const placing = ref(false)
+const orderError = ref('')
+const lastOrder = ref(null)
+
+async function placeOrder() {
+  orderError.value = ''
+  placing.value = true
+  try {
+    // The server works out prices and totals, so we only send what the user picked
+    const payload = items.value.map((item) => ({ productId: item.id, quantity: item.quantity }))
+    lastOrder.value = await createOrder(payload)
+    cart.clear()
+  } catch (err) {
+    orderError.value = err.message
+  } finally {
+    placing.value = false
+  }
 }
 </script>

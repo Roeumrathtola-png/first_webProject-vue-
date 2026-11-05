@@ -67,22 +67,18 @@
   </header>
 </template>
 
-<script>
-import { mapActions, mapState } from 'pinia'
+<script setup>
+import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/auth.js'
 
-export default {
-  computed: {
-    ...mapState(useAuthStore, ['user', 'isAdmin', 'isLoggedIn']),
+defineProps({
+  itemsCount: {
+    type: Number,
+    default: 0,
   },
-  methods: {
-    ...mapActions(useAuthStore, ['logout']),
-  },
-  props: {
-    itemsCount: {
-      type: Number,
-      default: 0,
-    },
-  },
-}
+})
+
+const authStore = useAuthStore()
+const { user, isAdmin, isLoggedIn } = storeToRefs(authStore)
+const { logout } = authStore
 </script>

@@ -8,24 +8,12 @@
     <FooterSection />
   </div>
 </template>
-<script>
+<script setup>
 import AnnounBar from '@/components/AnnounBar.vue'
 import NavBar from '@/components/NavBar.vue'
 import FooterSection from './components/FooterSection.vue'
 import { useCartStore } from '@/stores/Cart'
-import { mapState } from 'pinia'
+import { storeToRefs } from 'pinia'
 
-export default {
-  components: {
-    NavBar,
-    FooterSection,
-    AnnounBar,
-  },
-  computed: {
-    ...mapState(useCartStore,{itemsCount: 'count'}),
-  },
-
-
-
-}
+const { count: itemsCount } = storeToRefs(useCartStore())
 </script>

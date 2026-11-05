@@ -5,8 +5,6 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: ['NumberA', 'NameA'],
-}
+<script setup>
+defineProps(['NumberA', 'NameA'])
 </script>

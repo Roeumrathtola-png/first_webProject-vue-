@@ -3,14 +3,7 @@
   <FaqSection />
 </template>
 
-<script>
+<script setup>
 import PerkBox from '@/components/PerkBox.vue'
 import FaqSection from '@/components/FaqSection.vue'
-
-export default {
-  components: {
-    PerkBox,
-    FaqSection,
-  },
-}
 </script>

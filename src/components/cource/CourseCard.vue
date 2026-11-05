@@ -9,20 +9,18 @@
         </div>
     </article>
 </template>
-<script>
-export default {
-    props: {
-        course: {
-            type: Object,
-            default: () => {
-                return {
-                    id: '',
-                    full_name: '',
-                    avatar_url: '',
+<script setup>
+defineProps({
+    course: {
+        type: Object,
+        default: () => {
+            return {
+                id: '',
+                full_name: '',
+                avatar_url: '',
 
-                }
             }
         }
     }
-}
+})
 </script>

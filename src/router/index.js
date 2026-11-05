@@ -6,6 +6,7 @@ import AboutPage from '@/views/AboutPage.vue'
 import UnfoundPage from '@/views/UnfoundPage.vue'
 import LoginView from '@/views/LoginView.vue'
 import AdminView from '@/views/AdminView.vue'
+import CartView from '@/views/CartView.vue'
 import CheckoutView from '@/views/CheckoutView.vue'
 import OrdersView from '@/views/OrdersView.vue'
 import { useAuthStore } from '@/stores/auth.js'
@@ -18,6 +19,8 @@ const router = createRouter({
     { path: '/about', component: AboutPage, meta: { public: true } },
     { path: '/shop', component: ShopPage, meta: { public: true } },
     { path: '/login', name: 'login', component: LoginView, meta: { public: true } },
+    // The cart lives in the browser, so guests can open it too
+    { path: '/cart', name: 'cart', component: CartView, meta: { public: true } },
     // Every other route needs a login by default (see beforeEach)
     { path: '/checkout', name: 'checkout', component: CheckoutView },
     { path: '/orders', name: 'orders', component: OrdersView },

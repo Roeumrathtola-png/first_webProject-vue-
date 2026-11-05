@@ -31,32 +31,24 @@
     </div>
   </section>
 </template>
-<script>
+<script setup>
 import PerksCard from '@/components/perks/PerksCard.vue'
-export default {
-  components: {
-    PerksCard,
+
+const perks = [
+  {
+    number: 'Peter 01',
+    title: 'Free shipping',
+    description: 'Order more than $30 and we pay for the delivery.',
   },
-  data() {
-    return {
-      perks: [
-        {
-          number: 'Peter 01',
-          title: 'Free shipping',
-          description: 'Order more than $30 and we pay for the delivery.',
-        },
-        {
-          number: 'Ossca 02',
-          title: '30 days return',
-          description: 'Order more than $30 and we pay for the delivery.',
-        },
-        {
-          number: 'Ossca 03',
-          title: 'Free sticker',
-          description: 'Order more than $30 and we pay for the delivery.',
-        },
-      ],
-    }
+  {
+    number: 'Ossca 02',
+    title: '30 days return',
+    description: 'Order more than $30 and we pay for the delivery.',
   },
-}
+  {
+    number: 'Ossca 03',
+    title: 'Free sticker',
+    description: 'Order more than $30 and we pay for the delivery.',
+  },
+]
 </script>

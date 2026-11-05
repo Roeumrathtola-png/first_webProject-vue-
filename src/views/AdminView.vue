@@ -141,113 +141,107 @@
   </section>
 </template>
 
-<script>
+<script setup>
+import { ref, watch } from 'vue'
 import BrutalCard from '@/components/BrutalCard.vue'
 import { createProduct, deleteProduct, getProducts, updateProduct } from '@/services/api.js'
 
 const emptyForm = () => ({ name: '', category: '', price: null, oldPrice: null })
 
-export default {
-  components: {
-    BrutalCard,
-  },
-  data() {
-    return {
-      products: [],
-      form: emptyForm(),
-      editingId: null,
-      loading: false,
-      saving: false,
-      error: '',
-      page: 1,
-      limit: 8,
-      limitOptions: [4, 8, 16, 48],
-      totalPages: 1,
+const products = ref([])
+const form = ref(emptyForm())
+const editingId = ref(null)
+const loading = ref(false)
+const saving = ref(false)
+const error = ref('')
+const page = ref(1)
+const limit = ref(8)
+const limitOptions = [4, 8, 16, 48]
+const totalPages = ref(1)
+
+// A new page size starts again from page 1
+watch(limit, () => {
+  page.value = 1
+  loadProducts()
+})
+
+async function loadProducts() {
+  loading.value = true
+  try {
+    const response = await getProducts({ page: page.value, limit: limit.value })
+    products.value = response.data ?? response
+    totalPages.value = response.meta?.totalPages ?? 1
+    // The last product on this page was deleted: step back to the previous page
+    if (products.value.length === 0 && page.value > 1) {
+      page.value--
+      await loadProducts()
     }
-  },
-  watch: {
-    // A new page size starts again from page 1
-    limit() {
-      this.page = 1
-      this.loadProducts()
-    },
-  },
-  async created() {
-    await this.loadProducts()
-  },
-  methods: {
-    async loadProducts() {
-      this.loading = true
-      try {
-        const response = await getProducts({ page: this.page, limit: this.limit })
-        this.products = response.data ?? response
-        this.totalPages = response.meta?.totalPages ?? 1
-        // The last product on this page was deleted: step back to the previous page
-        if (this.products.length === 0 && this.page > 1) {
-          this.page--
-          await this.loadProducts()
-        }
-      } catch (err) {
-        this.error = err.message
-      } finally {
-        this.loading = false
-      }
-    },
-    async goToPage(target) {
-      if (target < 1 || target > this.totalPages) return
-      this.page = target
-      await this.loadProducts()
-    },
-    startEdit(product) {
-      this.editingId = product.id
-      this.form = {
-        name: product.name,
-        category: product.category,
-        price: product.price,
-        oldPrice: product.oldPrice ?? null,
-      }
-      this.error = ''
-    },
-    resetForm() {
-      this.editingId = null
-      this.form = emptyForm()
-      this.error = ''
-    },
-    async save() {
-      this.error = ''
-      this.saving = true
-      // An empty old price means "no sale", so send null rather than 0 or ''
-      const payload = {
-        ...this.form,
-        oldPrice:
-          this.form.oldPrice === '' || this.form.oldPrice == null ? null : this.form.oldPrice,
-      }
-      try {
-        if (this.editingId) {
-          await updateProduct(this.editingId, payload)
-        } else {
-          await createProduct(payload)
-        }
-        this.resetForm()
-        await this.loadProducts()
-      } catch (err) {
-        // The server's message (for example "name is required") is shown here
-        this.error = err.message
-      } finally {
-        this.saving = false
-      }
-    },
-    async remove(product) {
-      if (!window.confirm(`Delete "${product.name}"?`)) return
-      this.error = ''
-      try {
-        await deleteProduct(product.id)
-        if (this.editingId === product.id) this.resetForm()
-        await this.loadProducts()
-      } catch (err) {
-        this.error = err.message
-      }
-    },
-  },
+  } catch (err) {
+    error.value = err.message
+  } finally {
+    loading.value = false
+  }
 }
+
+async function goToPage(target) {
+  if (target < 1 || target > totalPages.value) return
+  page.value = target
+  await loadProducts()
+}
+
+function startEdit(product) {
+  editingId.value = product.id
+  form.value = {
+    name: product.name,
+    category: product.category,
+    price: product.price,
+    oldPrice: product.oldPrice ?? null,
+  }
+  error.value = ''
+}
+
+function resetForm() {
+  editingId.value = null
+  form.value = emptyForm()
+  error.value = ''
+}
+
+async function save() {
+  error.value = ''
+  saving.value = true
+  // An empty old price means "no sale", so send null rather than 0 or ''
+  const payload = {
+    ...form.value,
+    oldPrice:
+      form.value.oldPrice === '' || form.value.oldPrice == null ? null : form.value.oldPrice,
+  }
+  try {
+    if (editingId.value) {
+      await updateProduct(editingId.value, payload)
+    } else {
+      await createProduct(payload)
+    }
+    resetForm()
+    await loadProducts()
+  } catch (err) {
+    // The server's message (for example "name is required") is shown here
+    error.value = err.message
+  } finally {
+    saving.value = false
+  }
+}
+
+async function remove(product) {
+  if (!window.confirm(`Delete "${product.name}"?`)) return
+  error.value = ''
+  try {
+    await deleteProduct(product.id)
+    if (editingId.value === product.id) resetForm()
+    await loadProducts()
+  } catch (err) {
+    error.value = err.message
+  }
+}
+
+loadProducts()
 </script>

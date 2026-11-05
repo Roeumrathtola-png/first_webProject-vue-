@@ -20,8 +20,7 @@
       <p class="text-sm font-medium">{{ product.description }}</p>
       <div class="mt-auto pt-3 flex items-center justify-between gap-2">
         <p class="text-xl font-black">
-          $
-          {{ product.price }}
+          ${{ product.price }}
           <span v-if="product.oldPrice" class="text-sm font-bold line-through text-black/50">{{
             product.oldPrice
           }}</span>
@@ -52,29 +51,24 @@
     </div>
   </article>
 </template>
-<script>
-import { mapActions } from 'pinia'
+<script setup>
+import { computed } from 'vue'
 import { useCartStore } from '@/stores/Cart'
-export default {
-  props: {
-    product: {
-      type: Object,
-      required: true,
-    },
-  },
 
-  computed: {
-    // A product with an old price is on sale; clearing the old price removes the badge
-    badge() {
-      if (this.product.badge) return this.product.badge
-      if (this.product.oldPrice)
-        return { label: 'Sale', class: 'bg-brand text-white border-2 border-black' }
-      return null
-    },
+const props = defineProps({
+  product: {
+    type: Object,
+    required: true,
   },
+})
 
-  methods: {
-    ...mapActions(useCartStore, { addToCart: 'add' }),
-  },
-}
+const { add: addToCart } = useCartStore()
+
+// A product with an old price is on sale; clearing the old price removes the badge
+const badge = computed(() => {
+  if (props.product.badge) return props.product.badge
+  if (props.product.oldPrice)
+    return { label: 'Sale', class: 'bg-brand text-white border-2 border-black' }
+  return null
+})
 </script>

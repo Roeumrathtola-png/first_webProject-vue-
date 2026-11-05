@@ -35,31 +35,36 @@
   </section>
 </template>
 
-<script>
-import { mapActions, mapState } from 'pinia'
+<script setup>
+import { ref, onBeforeUnmount } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useProductStore } from '@/stores/Stores'
 
-export default {
-  data() {
-    return {
-      searchQuery: '',
-      categories: ['All', 'Stickers', 'Apparel', 'Desk'],
-      debounceTimer: null,
-    }
-  },
-  computed: {
-    ...mapState(useProductStore, ['meta']),
-  },
-  methods: {
-    ...mapActions(useProductStore, ['setCategory', 'setSearch']),
+const productStore = useProductStore()
+const { meta } = storeToRefs(productStore)
+const { setCategory, setSearch } = productStore
 
-    onSearchInput() {
-      // Optional: Add a short debounce to avoid firing an API call on every single keystroke instantly
-      clearTimeout(this.debounceTimer)
-      this.debounceTimer = setTimeout(() => {
-        this.setSearch(this.searchQuery)
-      }, 300)
-    },
-  },
+const searchQuery = ref('')
+const categories = ['All', 'Stickers', 'Apparel', 'Desk']
+
+// Wait until the user stops typing before calling the API (one request per pause, not per keystroke)
+const SEARCH_DEBOUNCE_MS = 400
+let debounceTimer = null
+let lastSearched = meta.value.search
+
+function runSearch() {
+  const query = searchQuery.value.trim()
+  // Skip if the query did not really change (e.g. only spaces were added or removed)
+  if (query === lastSearched) return
+  lastSearched = query
+  setSearch(query)
 }
+
+function onSearchInput() {
+  clearTimeout(debounceTimer)
+  debounceTimer = setTimeout(runSearch, SEARCH_DEBOUNCE_MS)
+}
+
+// Do not let a pending search fire after this component is gone
+onBeforeUnmount(() => clearTimeout(debounceTimer))
 </script>

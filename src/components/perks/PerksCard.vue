@@ -5,8 +5,6 @@
     <p class="mt-2 text-sm font-medium">{{ perkDescription }}</p>
   </div>
 </template>
-<script>
-export default {
-  props: ['perkNumber', 'perkTitle', 'perkDescription']
-}
+<script setup>
+defineProps(['perkNumber', 'perkTitle', 'perkDescription'])
 </script>

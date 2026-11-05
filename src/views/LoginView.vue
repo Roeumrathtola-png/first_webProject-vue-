@@ -39,33 +39,30 @@
   </section>
 </template>
 
-<script>
-import { mapActions } from 'pinia'
+<script setup>
+import { ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.js'
 
-export default {
-  data() {
-    return {
-      email: '',
-      password: '',
-      busy: false,
-      error: '',
-    }
-  },
-  methods: {
-    ...mapActions(useAuthStore, ['login']),
-    async submit() {
-      this.error = ''
-      this.busy = true
-      try {
-        await this.login(this.email, this.password)
-        this.$router.push(this.$route.query.redirect || '/')
-      } catch (err) {
-        this.error = err.message
-      } finally {
-        this.busy = false
-      }
-    },
-  },
+const router = useRouter()
+const route = useRoute()
+const { login } = useAuthStore()
+
+const email = ref('')
+const password = ref('')
+const busy = ref(false)
+const error = ref('')
+
+async function submit() {
+  error.value = ''
+  busy.value = true
+  try {
+    await login(email.value, password.value)
+    router.push(route.query.redirect || '/')
+  } catch (err) {
+    error.value = err.message
+  } finally {
+    busy.value = false
+  }
 }
 </script>

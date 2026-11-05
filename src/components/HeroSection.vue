@@ -50,20 +50,12 @@
     </div>
   </section>
 </template>
-<script>
+<script setup>
 import HeroElement from '@/components/heroelement/HeroElement.vue'
-export default {
-  components: {
-    HeroElement,
-  },
-  data() {
-    return {
-      Hero: [
-        { NumberA: 34, NameA: 'ogg' },
-        { NumberA: 24, NameA: 'mygo' },
-        { NumberA: 0, NameA: 'blur' },
-      ],
-    }
-  },
-}
+
+const Hero = [
+  { NumberA: 34, NameA: 'ogg' },
+  { NumberA: 24, NameA: 'mygo' },
+  { NumberA: 0, NameA: 'blur' },
+]
 </script>

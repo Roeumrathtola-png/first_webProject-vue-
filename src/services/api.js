@@ -54,6 +54,8 @@ export const getProduct = (id) => request(`/products/${id}`)
 export const createOrder = (items) => request('/orders', { method: 'POST', body: { items } })
 export const login = (email, password) =>
   request('/auth/login', { method: 'POST', body: { email, password } })
+// Returns the logged-in user for the saved token (401 if the token is missing or expired)
+export const getMe = () => request('/auth/me')
 export const getMyOrders = () => request('/orders')
 export const createProduct = (product) => request('/products', { method: 'POST', body: product })
 export const updateProduct = (id, product) =>

@@ -1,15 +1,22 @@
 <template>
   <section class="max-w-6xl mx-auto px-6 pt-14">
-    <label for="limit-select" class="font-extrabold uppercase text-sm mr-2">Items per page:</label>
-    <select
-      id="limit-select"
-      v-model.number="currentOption"
-      class="border-2 border-black bg-white px-3 py-2 mb-6 text-sm font-extrabold uppercase cursor-pointer"
-    >
-      <option v-for="currentoption in pageOptions" :key="currentoption" :value="currentoption">
-        {{ currentoption }}
-      </option>
-    </select>
+    <div class="flex items-center gap-3 mb-6">
+      <div class="w-4 h-4 bg-brand border-2 border-black"></div>
+      <h2 class="text-2xl font-black uppercase">Shop</h2>
+    </div>
+
+    <div class="bg-white border-4 border-black shadow-brutal p-4 flex flex-wrap items-center gap-4 mb-6">
+      <label for="limit-select" class="font-extrabold uppercase text-sm">Items per page:</label>
+      <select
+        id="limit-select"
+        v-model.number="currentOption"
+        class="border-2 border-black bg-paper px-3 py-2 text-sm font-extrabold uppercase cursor-pointer focus:outline-none focus:bg-white"
+      >
+        <option v-for="currentoption in pageOptions" :key="currentoption" :value="currentoption">
+          {{ currentoption }}
+        </option>
+      </select>
+    </div>
 
     <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
       <ProductCard
@@ -19,6 +26,11 @@
         :product="product"
       />
     </div>
+
+    <p class="mt-4 text-sm font-bold uppercase">
+      Showing {{ products.length }} of {{ meta.total }} products
+    </p>
+
     <nav
       v-if="meta.totalPages > 1"
       aria-label="Pagination"
@@ -66,61 +78,44 @@
     </p>
   </section>
 </template>
-<script>
-import { mapActions, mapState } from 'pinia'
+<script setup>
+import { ref, computed, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useProductStore } from '@/stores/Stores'
 import ProductCard from '@/components/productcard/ProductCard.vue'
 
-export default {
-  components: {
-    ProductCard,
-  },
-  data() {
-    return {
-      currentOption: 4,
-      pageOptions: [4, 8, 16, 48],
-      limitoption: 0,
-      enabledClass: 'bg-white hover:bg-paper cursor-pointer',
-      disabledClass: 'bg-paper text-black/40 cursor-not-allowed',
-    }
-  },
-  async created() {
-    // Sync the store's limit with the selected option before the first fetch
-    await this.fetchUpdateOption(this.currentOption)
-  },
-  computed: {
-    ...mapState(useProductStore, ['products', 'meta', 'hasPreviousPage', 'hasNextPage']),
-    // 1 ... (current - 1) current (current + 1) ... last
-    pageItems() {
-      const { page, totalPages } = this.meta
-      const pages = new Set([1, totalPages, page - 1, page, page + 1])
-      const sorted = [...pages].filter((p) => p >= 1 && p <= totalPages).sort((a, b) => a - b)
-      const items = []
-      sorted.forEach((p, i) => {
-        if (i > 0) {
-          const gap = p - sorted[i - 1]
-          if (gap === 2) items.push(p - 1)
-          else if (gap > 2) items.push('...')
-        }
-        items.push(p)
-      })
-      return items
-    },
-  },
-  watch: {
-    currentOption(pageOption) {
-      this.fetchUpdateOption(pageOption)
-    },
-  },
-  emits: ['add'],
+defineEmits(['add'])
 
-  methods: {
-    ...mapActions(useProductStore, [
-      'goToPage',
-      'nextPage',
-      'previousPage',
-      'fetchUpdateOption',
-    ]),
-  },
-}
+const productStore = useProductStore()
+const { products, meta, hasPreviousPage, hasNextPage } = storeToRefs(productStore)
+const { goToPage, nextPage, previousPage, fetchUpdateOption } = productStore
+
+const currentOption = ref(4)
+const pageOptions = [4, 8, 16, 48]
+const enabledClass = 'bg-white hover:bg-paper cursor-pointer'
+const disabledClass = 'bg-paper text-black/40 cursor-not-allowed'
+
+// 1 ... (current - 1) current (current + 1) ... last
+const pageItems = computed(() => {
+  const { page, totalPages } = meta.value
+  const pages = new Set([1, totalPages, page - 1, page, page + 1])
+  const sorted = [...pages].filter((p) => p >= 1 && p <= totalPages).sort((a, b) => a - b)
+  const items = []
+  sorted.forEach((p, i) => {
+    if (i > 0) {
+      const gap = p - sorted[i - 1]
+      if (gap === 2) items.push(p - 1)
+      else if (gap > 2) items.push('...')
+    }
+    items.push(p)
+  })
+  return items
+})
+
+watch(currentOption, (pageOption) => {
+  fetchUpdateOption(pageOption)
+})
+
+// Sync the store's limit with the selected option before the first fetch
+fetchUpdateOption(currentOption.value)
 </script>
