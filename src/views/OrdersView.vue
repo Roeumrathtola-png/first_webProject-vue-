@@ -19,30 +19,48 @@
       You have no orders yet.
     </p>
 
-    <ul v-else class="space-y-4">
-      <li
-        v-for="order in orders"
-        :key="order.id"
-        class="bg-white border-4 border-black shadow-brutal p-5"
+    <template v-else>
+      <button
+        v-if="isAdmin"
+        type="button"
+        class="mb-6 border-2 border-black bg-brand text-white px-4 py-2 font-extrabold uppercase"
+        @click="clearOrders"
       >
-        <div class="flex flex-wrap justify-between gap-2 mb-3">
-          <h2 class="text-lg font-black uppercase">Order #{{ order.id }}</h2>
-          <p class="font-black">${{ Number(order.total).toFixed(2) }}</p>
-        </div>
-        <ul class="text-sm font-medium space-y-1">
-          <li v-for="line in order.items" :key="line.productId">
-            {{ line.name }} × {{ line.quantity }} (${{ Number(line.price).toFixed(2) }} each)
-          </li>
-        </ul>
-        <p class="text-xs font-medium mt-3">{{ new Date(order.createdAt).toLocaleString() }}</p>
-      </li>
-    </ul>
+        Clear saved orders
+      </button>
+
+      <ul class="space-y-4">
+        <li
+          v-for="order in orders"
+          :key="order.id"
+          class="bg-white border-4 border-black shadow-brutal p-5"
+        >
+          <div class="flex flex-wrap justify-between gap-2 mb-3">
+            <h2 class="text-lg font-black uppercase">Order #{{ order.id }}</h2>
+            <p class="font-black">${{ Number(order.total).toFixed(2) }}</p>
+          </div>
+          <ul class="text-sm font-medium space-y-1">
+            <li v-for="line in order.items" :key="line.productId">
+              {{ line.name }} × {{ line.quantity }} (${{ Number(line.price).toFixed(2) }} each)
+            </li>
+          </ul>
+          <p class="text-xs font-medium mt-3">{{ new Date(order.createdAt).toLocaleString() }}</p>
+        </li>
+      </ul>
+    </template>
   </section>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import { getMyOrders } from '@/services/api.js'
+import { useAuthStore } from '@/stores/auth.js'
+import { saveJSON, removeJSON } from '@/utils/storage.js'
+
+const ORDERS_KEY = 'brutal-orders'
+
+const { isAdmin } = storeToRefs(useAuthStore())
 
 const orders = ref([])
 const loading = ref(true)
@@ -51,11 +69,20 @@ const error = ref('')
 async function loadOrders() {
   try {
     orders.value = await getMyOrders()
+    // Keep a local copy so the admin can clear it later
+    saveJSON(ORDERS_KEY, orders.value)
   } catch (err) {
     error.value = err.message
   } finally {
     loading.value = false
   }
+}
+
+// Admin only: remove the saved orders from localStorage and clear the list on screen
+function clearOrders() {
+  if (!isAdmin.value) return
+  removeJSON(ORDERS_KEY)
+  orders.value = []
 }
 
 loadOrders()

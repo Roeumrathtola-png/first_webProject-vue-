@@ -13,3 +13,7 @@ export function loadJSON(key, fallback = null) {
 export function saveJSON(key, value) {
   localStorage.setItem(key, JSON.stringify(value))
 }
+
+export function removeJSON(key) {
+  localStorage.removeItem(key)
+}
