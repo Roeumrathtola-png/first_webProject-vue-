@@ -68,7 +68,9 @@ const error = ref('')
 
 async function loadOrders() {
   try {
-    orders.value = await getMyOrders()
+    // The API wraps lists as { data, meta }; accept a bare array too
+    const response = await getMyOrders()
+    orders.value = response.data ?? response
     // Keep a local copy so the admin can clear it later
     saveJSON(ORDERS_KEY, orders.value)
   } catch (err) {

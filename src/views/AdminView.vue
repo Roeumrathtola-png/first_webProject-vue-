@@ -1,4 +1,5 @@
 <template>
+  <FilterBar />
   <section class="max-w-6xl mx-auto px-6 pt-14 pb-20">
     <h1 class="text-4xl font-black uppercase mb-8">Admin: products</h1>
 
@@ -160,6 +161,7 @@
 </template>
 
 <script setup>
+import FilterBar from '@/components/FilterBar.vue'
 import { ref, watch } from 'vue'
 import BrutalCard from '@/components/BrutalCard.vue'
 import { createProduct, deleteProduct, getProducts, updateProduct } from '@/services/api.js'
