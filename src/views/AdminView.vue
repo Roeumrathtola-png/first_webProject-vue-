@@ -13,10 +13,16 @@
         </label>
         <label class="flex flex-col gap-1 text-sm font-extrabold uppercase">
           Category
-          <input
+          <select
             v-model="form.category"
-            class="border-2 border-black px-3 py-2 font-medium normal-case"
-          />
+            required
+            class="border-2 border-black bg-white px-3 py-2 font-medium normal-case"
+          >
+            <option value="" disabled>Choose a category</option>
+            <option v-for="category in categoryOptions" :key="category" :value="category">
+              {{ category }}
+            </option>
+          </select>
         </label>
         <label class="flex flex-col gap-1 text-sm font-extrabold uppercase">
           Price
@@ -37,6 +43,18 @@
             step="0.01"
             class="border-2 border-black px-3 py-2 font-medium"
           />
+        </label>
+        <label class="sm:col-span-2 flex flex-col gap-1 text-sm font-extrabold uppercase">
+          Description (optional)
+          <textarea
+            v-model="form.description"
+            rows="3"
+            class="border-2 border-black px-3 py-2 font-medium normal-case"
+          />
+        </label>
+        <label class="flex items-center gap-2 text-sm font-extrabold uppercase">
+          <input v-model="form.soldOut" type="checkbox" class="size-4 accent-black" />
+          Sold out
         </label>
 
         <p
@@ -146,7 +164,16 @@ import { ref, watch } from 'vue'
 import BrutalCard from '@/components/BrutalCard.vue'
 import { createProduct, deleteProduct, getProducts, updateProduct } from '@/services/api.js'
 
-const emptyForm = () => ({ name: '', category: '', price: null, oldPrice: null })
+// The categories the API accepts (anything else gets a 400 from the server)
+const categoryOptions = ['Stickers', 'Apparel', 'Desk']
+const emptyForm = () => ({
+  name: '',
+  category: '',
+  price: null,
+  oldPrice: null,
+  description: '',
+  soldOut: false,
+})
 
 const products = ref([])
 const form = ref(emptyForm())
@@ -196,6 +223,8 @@ function startEdit(product) {
     category: product.category,
     price: product.price,
     oldPrice: product.oldPrice ?? null,
+    description: product.description ?? '',
+    soldOut: Boolean(product.soldOut),
   }
   error.value = ''
 }
@@ -210,10 +239,15 @@ async function save() {
   error.value = ''
   saving.value = true
   // An empty old price means "no sale", so send null rather than 0 or ''
+  // An empty description is left out, so the server stores no description
   const payload = {
-    ...form.value,
+    name: form.value.name.trim(),
+    category: form.value.category,
+    price: form.value.price,
     oldPrice:
       form.value.oldPrice === '' || form.value.oldPrice == null ? null : form.value.oldPrice,
+    soldOut: form.value.soldOut,
+    ...(form.value.description.trim() ? { description: form.value.description.trim() } : {}),
   }
   try {
     if (editingId.value) {
