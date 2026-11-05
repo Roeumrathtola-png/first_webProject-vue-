@@ -34,7 +34,7 @@ export const useProductStore = defineStore('products', {
           : ''
 
         let response = await fetch(
-          `https://brutal-api-sample.onrender.com/api/products?limit=${this.meta.limit}&page=${this.meta.page}${categoryParam}${searchParam}`,
+          `${import.meta.env.VITE_API_URL}/products?limit=${this.meta.limit}&page=${this.meta.page}${categoryParam}${searchParam}`,
         )
         response = await response.json()
         if (response.error) throw new Error(response.error)

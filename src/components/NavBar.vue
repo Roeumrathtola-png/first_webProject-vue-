@@ -31,6 +31,28 @@
             Admin
           </RouterLink>
         </li>
+        <li v-if="isLoggedIn">
+          <RouterLink to="/orders" class="px-3 py-2 border-2 border-transparent hover:border-black">
+            Orders
+          </RouterLink>
+        </li>
+        <li v-if="!isLoggedIn">
+          <RouterLink to="/login" class="px-3 py-2 border-2 border-transparent hover:border-black">
+            Login
+          </RouterLink>
+        </li>
+        <li v-else class="flex items-center gap-2">
+          <span class="px-3 py-2 border-2 border-black bg-white">{{
+            user.name ?? user.email
+          }}</span>
+          <button
+            type="button"
+            class="px-3 py-2 border-2 border-transparent hover:border-black uppercase cursor-pointer"
+            @click="logout"
+          >
+            Logout
+          </button>
+        </li>
         <li>
           <RouterLink
             to="/cart"
@@ -46,12 +68,15 @@
 </template>
 
 <script>
-import { mapState } from 'pinia'
+import { mapActions, mapState } from 'pinia'
 import { useAuthStore } from '@/stores/auth.js'
 
 export default {
   computed: {
-    ...mapState(useAuthStore, ['isAdmin']),
+    ...mapState(useAuthStore, ['user', 'isAdmin', 'isLoggedIn']),
+  },
+  methods: {
+    ...mapActions(useAuthStore, ['logout']),
   },
   props: {
     itemsCount: {

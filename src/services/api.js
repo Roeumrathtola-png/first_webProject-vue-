@@ -45,7 +45,11 @@ async function request(path, options = {}) {
   }
   return data
 }
-export const getProducts = () => request('/products')
+// params is optional, for example { page: 2, limit: 8 }
+export const getProducts = (params = {}) => {
+  const query = new URLSearchParams(params).toString()
+  return request(`/products${query ? `?${query}` : ''}`)
+}
 export const getProduct = (id) => request(`/products/${id}`)
 export const createOrder = (items) => request('/orders', { method: 'POST', body: { items } })
 export const login = (email, password) =>

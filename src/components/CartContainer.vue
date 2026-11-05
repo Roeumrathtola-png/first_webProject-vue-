@@ -29,6 +29,7 @@
             Clear
           </button>
           <button
+            @click="$router.push('/checkout')"
             class="border-2 border-black bg-brand text-white shadow-brutal-sm px-4 py-2 text-sm font-extrabold uppercase cursor-pointer hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
           >
             Checkout

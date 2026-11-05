@@ -6,10 +6,10 @@
     >
       <span class="text-6xl font-black leading-none">{{ product.number }}</span>
       <span
-        v-if="product.badge"
+        v-if="badge"
         class="absolute top-3 right-3 text-xs font-extrabold uppercase px-2 py-1"
-        :class="product.badge.class"
-        >{{ product.badge.label }}</span
+        :class="badge.class"
+        >{{ badge.label }}</span
       >
     </div>
     <div class="p-4 flex flex-col gap-2 grow">
@@ -59,8 +59,18 @@ export default {
   props: {
     product: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
+  },
+
+  computed: {
+    // A product with an old price is on sale; clearing the old price removes the badge
+    badge() {
+      if (this.product.badge) return this.product.badge
+      if (this.product.oldPrice)
+        return { label: 'Sale', class: 'bg-brand text-white border-2 border-black' }
+      return null
+    },
   },
 
   methods: {

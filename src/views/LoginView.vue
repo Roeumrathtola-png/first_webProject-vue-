@@ -30,10 +30,10 @@
 
       <button
         type="submit"
-        :disabled="submitting"
+        :disabled="busy"
         class="border-2 border-black bg-brand text-white shadow-brutal-sm px-4 py-2 text-sm font-extrabold uppercase cursor-pointer disabled:opacity-50"
       >
-        {{ submitting ? 'Logging in...' : 'Log in' }}
+        {{ busy ? 'Logging in...' : 'Log in' }}
       </button>
     </form>
   </section>
@@ -48,7 +48,7 @@ export default {
     return {
       email: '',
       password: '',
-      submitting: false,
+      busy: false,
       error: '',
     }
   },
@@ -56,14 +56,14 @@ export default {
     ...mapActions(useAuthStore, ['login']),
     async submit() {
       this.error = ''
-      this.submitting = true
+      this.busy = true
       try {
         await this.login(this.email, this.password)
         this.$router.push(this.$route.query.redirect || '/')
       } catch (err) {
         this.error = err.message
       } finally {
-        this.submitting = false
+        this.busy = false
       }
     },
   },
